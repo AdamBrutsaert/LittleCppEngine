@@ -9,8 +9,9 @@ namespace Genesis
 		Window(uint32_t width, uint32_t height, std::string const& title);
 		~Window();
 
+		void setTitle(std::string const& title);
 		bool shouldClose() const;
-		void swapBuffers() const;
+		void swapBuffers();
 
 		static void PollEvents();
 

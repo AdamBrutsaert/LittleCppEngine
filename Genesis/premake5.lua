@@ -9,6 +9,7 @@ project "Genesis"
         "include", 
         "thirdparties/glfw/include",
         "thirdparties/glad/include",
+        "thirdparties/glm"
     }
 
     files { "include/**.h", "src/**.cpp"}

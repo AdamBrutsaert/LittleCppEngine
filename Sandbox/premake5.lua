@@ -5,10 +5,13 @@ project "Sandbox"
 
 	targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
-	includedirs { "%{wks.location}/Genesis/include" }
+	includedirs { 
+		"%{wks.location}/Genesis/include",  
+		"%{wks.location}/Genesis/thirdparties/glm",
+	}
 
 	links { "Genesis" }
-	files { "include/**.h", "src/**.cpp"}
+	files { "include/**.h", "src/**.cpp" }
 
 	filter "configurations:Debug"
 		symbols "On"

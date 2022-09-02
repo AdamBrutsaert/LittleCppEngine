@@ -2,6 +2,8 @@
 
 #include <chrono>
 
+#include <glad/glad.h>
+
 namespace Genesis
 {
 	static Application* s_Instance = nullptr;
@@ -12,6 +14,19 @@ namespace Genesis
 		  m_NextScene(nullptr)
 	{
 		s_Instance = this;
+	}
+
+	Application::Application(uint32_t width, uint32_t height, std::string const& title)
+		: m_Window(width, height, title),
+		  m_Scene(nullptr),
+		  m_NextScene(nullptr)
+	{
+		s_Instance = this;
+	}
+
+	Window& Application::getWindow()
+	{
+		return m_Window;
 	}
 
 	void Application::setScene(std::shared_ptr<Scene> scene)
@@ -38,6 +53,8 @@ namespace Genesis
 		decltype(begin) end;
 		float dt;
 
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+
 		while (!m_Window.shouldClose())
 		{
 			end = std::chrono::high_resolution_clock::now();
@@ -50,6 +67,8 @@ namespace Genesis
 				m_NextScene = nullptr;
 				m_Scene->onAttach();
 			}
+
+			glClear(GL_COLOR_BUFFER_BIT);
 
 			m_Scene->onUpdate(dt);
 

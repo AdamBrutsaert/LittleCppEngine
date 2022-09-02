@@ -67,12 +67,17 @@ namespace Genesis
 		ShutdownGLFW();
 	}
 
+	void Window::setTitle(std::string const& title)
+	{
+		glfwSetWindowTitle(static_cast<GLFWwindow*>(m_Window), title.c_str());
+	}
+
 	bool Window::shouldClose() const
 	{
 		return glfwWindowShouldClose(static_cast<GLFWwindow*>(m_Window));
 	}
 
-	void Window::swapBuffers() const
+	void Window::swapBuffers()
 	{
 		glfwSwapBuffers(static_cast<GLFWwindow*>(m_Window));
 	}
