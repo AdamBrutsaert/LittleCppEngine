@@ -9,4 +9,14 @@ project "Genesis"
 
   files { "include/**.h", "src/**.cpp"}
 
+  filter "configurations:Debug"
+    defines { "GEN_DEBUG" }
+    symbols "On"
+
+  filter "configurations:Release"
+    defines { "GEN_RELEASE" }
+    optimize "On"
+
+  filter {}
+
 include "thirdparties/glfw"

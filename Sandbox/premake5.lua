@@ -9,3 +9,9 @@ project "Sandbox"
 
   links { "Genesis" }
   files { "include/**.h", "src/**.cpp"}
+
+  filter "configurations:Debug"
+    symbols "On"
+
+  filter "configurations:Release"
+    optimize "On"
