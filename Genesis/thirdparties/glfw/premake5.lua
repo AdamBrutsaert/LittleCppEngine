@@ -61,3 +61,4 @@ project "Genesis"
     }
 
     defines { "_GLFW_WIN32", "UNICODE", "_UNICODE" }
+    links { "Dwmapi.lib" }
