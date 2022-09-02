@@ -5,7 +5,11 @@ project "Genesis"
 
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
     objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
-    includedirs { "include", "thirdparties/glfw/include" }
+    includedirs { 
+        "include", 
+        "thirdparties/glfw/include",
+        "thirdparties/glad/include",
+    }
 
     files { "include/**.h", "src/**.cpp"}
 
@@ -20,3 +24,4 @@ project "Genesis"
     filter {}
 
 include "thirdparties/glfw"
+include "thirdparties/glad"

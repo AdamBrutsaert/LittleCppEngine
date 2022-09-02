@@ -1,11 +1,13 @@
 #include "Core/Window.h"
 
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stdexcept>
 
 namespace Genesis 
 {
 	static bool s_IsGLFWInitialized = false;
+	static bool s_IsGLADInitialized = false;
 	static uint32_t s_WindowCount = 0;
 
 	static void InitializeGLFW()
@@ -26,6 +28,16 @@ namespace Genesis
 		}
 	}
 
+	static void InitializeGLAD()
+	{
+		if (!s_IsGLADInitialized) {
+			if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+				throw std::runtime_error("Failed to initialize GLAD!");
+			}
+			s_IsGLADInitialized = true;
+		}
+	}
+
 	Window::Window(uint32_t width, uint32_t height, std::string const& title)
 	{
 		InitializeGLFW();
@@ -42,6 +54,7 @@ namespace Genesis
 		}
 
 		glfwMakeContextCurrent(static_cast<GLFWwindow*>(m_Window));
+		InitializeGLAD();
 
 		s_WindowCount++;
 	}
