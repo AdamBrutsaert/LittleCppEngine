@@ -192,6 +192,16 @@ void main()
 		Stats.DrawCalls += 1;
 	}
 
+	void Renderer::SetClearColor(glm::vec4 color)
+	{
+		glClearColor(color.x, color.y, color.z, color.w);
+	}
+
+	void Renderer::Clear()
+	{
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+
 	void Renderer::DrawTriangle(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, glm::vec3 color) {
 		// Check if there are enough space
 		if (VertexCount + 3 > MAX_VERTICES || IndexCount + 3 > MAX_INDICES)

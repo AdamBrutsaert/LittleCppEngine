@@ -14,6 +14,9 @@ namespace Genesis
 		static void Begin();
 		static void End();
 
+		static void SetClearColor(glm::vec4 color);
+		static void Clear();
+
 		// Colorized
 		static void DrawTriangle(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, glm::vec3 color);
 		static void DrawQuad(glm::vec2 position, glm::vec2 size, glm::vec3 color);

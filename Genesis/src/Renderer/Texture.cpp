@@ -3,8 +3,6 @@
 #include <stb_image.h>
 #include <glad/glad.h>
 
-#include <iostream>
-
 namespace Genesis
 {
 	Texture::Texture(std::string const& path)
@@ -13,8 +11,6 @@ namespace Genesis
 
 		stbi_set_flip_vertically_on_load(true);
 		auto* pixels = stbi_load(path.c_str(), &w, &h, &bits, STBI_rgb);
-
-		std::cout << glBindTexture << std::endl;
 
 		glGenTextures(1, &m_TextureID);
 

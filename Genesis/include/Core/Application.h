@@ -11,22 +11,24 @@ namespace Genesis
 	class Application
 	{
 	public:
-		Application();
 		Application(uint32_t width, uint32_t height, std::string const& title);
 		virtual ~Application() = default;
 
-		Window& getWindow();
-		void setScene(std::shared_ptr<Scene> scene);
-
-		static Application* Get();
-
+		static std::shared_ptr<Window> const& GetWindow();
+		static void SetScene(std::shared_ptr<Scene> const& scene);
+		
 	private:
 		void run();
 
 	private:
 		friend int ::main();
 
-		Window m_Window;
+		uint32_t m_Width;
+		uint32_t m_Height;
+		std::string m_Title;
+
+		std::shared_ptr<Window> m_Window;
+
 		std::shared_ptr<Scene> m_Scene;
 		std::shared_ptr<Scene> m_NextScene;
 	};

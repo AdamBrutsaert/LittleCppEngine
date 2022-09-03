@@ -3,45 +3,43 @@
 #include <chrono>
 #include <stdexcept>
 
-#include <glad/glad.h>
+#include "Renderer/Renderer.h"
 
 namespace Genesis
 {
 	static Application* s_Instance = nullptr;
 
-	Application::Application() 
-		: m_Window(1280, 720, "Genesis Engine"),
-		  m_Scene(nullptr), 
-		  m_NextScene(nullptr)
-	{
-		s_Instance = this;
-	}
-
 	Application::Application(uint32_t width, uint32_t height, std::string const& title)
-		: m_Window(width, height, title),
+		: m_Width(width),
+		  m_Height(height),
+		  m_Title(title),
+		  m_Window(nullptr),
 		  m_Scene(nullptr),
 		  m_NextScene(nullptr)
 	{
+		if (s_Instance != nullptr) {
+			throw std::runtime_error("You can only create one Application!");
+		}
+
 		s_Instance = this;
 	}
 
-	Window& Application::getWindow()
+	std::shared_ptr<Window> const& Application::GetWindow()
 	{
-		return m_Window;
+		return s_Instance->m_Window;
 	}
 
-	void Application::setScene(std::shared_ptr<Scene> scene)
+	void Application::SetScene(std::shared_ptr<Scene> const& scene)
 	{
-		m_NextScene = scene;
-	}
-
-	Application* Application::Get()
-	{
-		return s_Instance;
+		s_Instance->m_NextScene = scene;
 	}
 
 	void Application::run()
 	{
+		m_Window = std::make_shared<Window>(m_Width, m_Height, m_Title);
+
+		Renderer::Initialize();
+
 		if (m_NextScene == nullptr) {
 			throw std::runtime_error("You must provide a Scene!");
 		}
@@ -54,9 +52,9 @@ namespace Genesis
 		decltype(begin) end;
 		float dt;
 
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		Renderer::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 
-		while (!m_Window.shouldClose())
+		while (!m_Window->shouldClose())
 		{
 			end = std::chrono::high_resolution_clock::now();
 			dt = std::chrono::duration<float>(end - begin).count();
@@ -69,14 +67,16 @@ namespace Genesis
 				m_Scene->onAttach();
 			}
 
-			glClear(GL_COLOR_BUFFER_BIT);
+			Renderer::Clear();
 
 			m_Scene->onUpdate(dt);
 
-			m_Window.swapBuffers();
+			m_Window->swapBuffers();
 			Window::PollEvents();
 		}
 
 		m_Scene->onDetach();
+
+		Renderer::Shutdown();
 	}
 }
