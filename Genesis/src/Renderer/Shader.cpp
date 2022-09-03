@@ -9,10 +9,12 @@
 
 namespace Genesis
 {
-	static uint32_t CompileShader(const char* source, GLenum type)
+	static uint32_t CompileShader(std::string const& source, GLenum type)
 	{
+		char const* content = source.c_str();
+
 		uint32_t shader = glCreateShader(type);
-		glShaderSource(shader, 1, &source, nullptr);
+		glShaderSource(shader, 1, &content, nullptr);
 		glCompileShader(shader);
 
 		int success;
@@ -31,7 +33,7 @@ namespace Genesis
 		return shader;
 	}
 
-	Shader::Shader(const char* vertexSource, const char* fragmentSource)
+	Shader::Shader(std::string const& vertexSource, std::string const& fragmentSource)
 	{
 		// Shaders
 		auto vertex = CompileShader(vertexSource, GL_VERTEX_SHADER);
@@ -66,14 +68,19 @@ namespace Genesis
 		glDeleteProgram(m_ProgramID);
 	}
 
-	void Shader::bind() const
+	std::shared_ptr<Shader> Shader::CreateFromSources(std::string const& vertexSource, std::string const& fragmentSource)
 	{
-		glUseProgram(m_ProgramID);
+		return std::make_shared<Shader>(vertexSource, fragmentSource);
 	}
 
 	void Shader::Unbind()
 	{
 		glUseProgram(0);
+	}
+
+	void Shader::bind() const
+	{
+		glUseProgram(m_ProgramID);
 	}
 
 	void Shader::setUniform1iv(const char* name, uint32_t count, int32_t* values)

@@ -10,7 +10,7 @@
 
 namespace Genesis
 {
-	static const char* s_VertexSource = R"(
+	static std::string s_VertexSource = R"(
 #version 330 core
 
 layout (location = 0) in vec2 vPosition;
@@ -27,7 +27,7 @@ void main()
 }
 )";
 
-	static const char* s_FragmentSource = R"(
+	static std::string s_FragmentSource = R"(
 #version 330 core
 
 uniform sampler2D uTextures[16];
@@ -98,31 +98,30 @@ void main()
 }
 )";
 
-	static Shader* s_Shader;
-
 	static constexpr uint32_t MAX_VERTICES = 50'000;
 	static constexpr uint32_t MAX_INDICES = 200'000;
 	static constexpr uint32_t MAX_TEXTURES = 16; // OpenGL3 ensures that there is at least 16 textures availables
 
-	static VertexBuffer* s_VertexBuffer = nullptr;
-	static IndexBuffer* s_IndexBuffer = nullptr;
-	static VertexArray* s_VertexArray = nullptr;
+	static std::shared_ptr<Shader> s_Shader = nullptr;
+	static std::shared_ptr<VertexBuffer> s_VertexBuffer = nullptr;
+	static std::shared_ptr<IndexBuffer> s_IndexBuffer = nullptr;
+	static std::shared_ptr<VertexArray> s_VertexArray = nullptr;
 
 	// Maybe batch Vertices and Indices together into a single array
-	static Vertex* Vertices = nullptr;
-	static uint32_t* Indices = nullptr;
-	static std::array<Texture const*, MAX_TEXTURES> Textures = { nullptr };
+	static Vertex* s_Vertices = nullptr;
+	static uint32_t* s_Indices = nullptr;
+	static std::array<Texture const*, MAX_TEXTURES> s_Textures = { nullptr };
 
-	static uint32_t VertexCount = 0;
-	static uint32_t IndexCount = 0;
-	static uint32_t TextureCount = 0;
+	static uint32_t s_VertexCount = 0;
+	static uint32_t s_IndexCount = 0;
+	static uint32_t s_TextureCount = 0;
 	
 	// Statistics
-	Renderer::Statistics Stats;
+	static Renderer::Statistics s_Statistics;
 
 	void Renderer::Initialize()
 	{
-		s_Shader = new Shader(s_VertexSource, s_FragmentSource);
+		s_Shader = Shader::CreateFromSources(s_VertexSource, s_FragmentSource);
 	
 		// Preparing textures
 		{
@@ -134,31 +133,30 @@ void main()
 			Shader::Unbind();
 		}
 
-		Vertices = new Vertex[MAX_VERTICES];
-		Indices = new uint32_t[MAX_INDICES];
+		s_Vertices = new Vertex[MAX_VERTICES];
+		s_Indices = new uint32_t[MAX_INDICES];
 
-		s_VertexBuffer = new VertexBuffer(MAX_VERTICES, GL_DYNAMIC_DRAW);
-		s_IndexBuffer = new IndexBuffer(MAX_INDICES, GL_DYNAMIC_DRAW);
-		s_VertexArray = new VertexArray(*s_VertexBuffer, *s_IndexBuffer);
+		s_VertexBuffer = VertexBuffer::Create(MAX_VERTICES, GL_DYNAMIC_DRAW);
+		s_IndexBuffer = IndexBuffer::Create(MAX_INDICES, GL_DYNAMIC_DRAW);
+		s_VertexArray = VertexArray::Create(s_VertexBuffer, s_IndexBuffer);
 	}
 
 	void Renderer::Shutdown()
 	{
-		delete s_Shader;
+		s_Shader = nullptr;
+		s_VertexBuffer = nullptr;
+		s_IndexBuffer = nullptr;
+		s_VertexArray = nullptr;
 
-		delete s_VertexBuffer;
-		delete s_IndexBuffer;
-		delete s_VertexArray;
-
-		delete[] Vertices;
-		delete[] Indices;
+		delete[] s_Vertices;
+		delete[] s_Indices;
 	}
 
 	void Renderer::Begin()
 	{
-		VertexCount = 0;
-		IndexCount = 0;
-		TextureCount = 0;
+		s_VertexCount = 0;
+		s_IndexCount = 0;
+		s_TextureCount = 0;
 	}
 
 	void Renderer::End()
@@ -170,17 +168,16 @@ void main()
 			s_VertexArray->bind();
 				
 				s_VertexBuffer->bind();
-				s_VertexBuffer->setData(Vertices, VertexCount);
+				s_VertexBuffer->setData(s_Vertices, s_VertexCount);
 
 				s_IndexBuffer->bind();
-				s_IndexBuffer->setData(Indices, IndexCount);
+				s_IndexBuffer->setData(s_Indices, s_IndexCount);
 
-				// Textures
-				for (uint32_t i = 0; i < TextureCount; i++) {
-					Textures[i]->bind(i);
+				for (uint32_t i = 0; i < s_TextureCount; i++) {
+					s_Textures[i]->bind(i);
 				}
 
-				glDrawElements(GL_TRIANGLES, IndexCount, GL_UNSIGNED_INT, nullptr);
+				glDrawElements(GL_TRIANGLES, s_IndexCount, GL_UNSIGNED_INT, nullptr);
 
 			VertexArray::Unbind();
 
@@ -189,7 +186,7 @@ void main()
 
 		Shader::Unbind();
 
-		Stats.DrawCalls += 1;
+		s_Statistics.DrawCalls += 1;
 	}
 
 	void Renderer::SetClearColor(glm::vec4 color)
@@ -204,71 +201,71 @@ void main()
 
 	void Renderer::DrawTriangle(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, glm::vec3 color) {
 		// Check if there are enough space
-		if (VertexCount + 3 > MAX_VERTICES || IndexCount + 3 > MAX_INDICES)
+		if (s_VertexCount + 3 > MAX_VERTICES || s_IndexCount + 3 > MAX_INDICES)
 		{
 			Renderer::End();
 			Renderer::Begin();
 		}
 
 		// Vertices
-		Vertices[VertexCount].Position = p1;
-		Vertices[VertexCount].Color = color;
+		s_Vertices[s_VertexCount].Position = p1;
+		s_Vertices[s_VertexCount].Color = color;
 
-		Vertices[VertexCount + 1].Position = p2;
-		Vertices[VertexCount + 1].Color = color;
+		s_Vertices[s_VertexCount + 1].Position = p2;
+		s_Vertices[s_VertexCount + 1].Color = color;
 
-		Vertices[VertexCount + 2].Position = p3;
-		Vertices[VertexCount + 2].Color = color;
+		s_Vertices[s_VertexCount + 2].Position = p3;
+		s_Vertices[s_VertexCount + 2].Color = color;
 
 		// Indices
-		Indices[IndexCount] = VertexCount;
-		Indices[IndexCount + 1] = VertexCount + 1;
-		Indices[IndexCount + 2] = VertexCount + 2;
+		s_Indices[s_IndexCount] = s_VertexCount;
+		s_Indices[s_IndexCount + 1] = s_VertexCount + 1;
+		s_Indices[s_IndexCount + 2] = s_VertexCount + 2;
 
-		VertexCount += 3;
-		IndexCount += 3;
+		s_VertexCount += 3;
+		s_IndexCount += 3;
 
-		Stats.Vertices += 3;
-		Stats.Indices += 3;
-		Stats.Triangles += 1;
+		s_Statistics.Vertices += 3;
+		s_Statistics.Indices += 3;
+		s_Statistics.Triangles += 1;
 	}
 
 	void Renderer::DrawQuad(glm::vec2 position, glm::vec2 size, glm::vec3 color)
 	{
 		// Check if there are enough space
-		if (VertexCount + 4 > MAX_VERTICES || IndexCount + 6 > MAX_INDICES)
+		if (s_VertexCount + 4 > MAX_VERTICES || s_IndexCount + 6 > MAX_INDICES)
 		{
 			Renderer::End();
 			Renderer::Begin();
 		}
 
 		// Vertices
-		Vertices[VertexCount].Position = position;
-		Vertices[VertexCount].Color = color;
+		s_Vertices[s_VertexCount].Position = position;
+		s_Vertices[s_VertexCount].Color = color;
 
-		Vertices[VertexCount + 1].Position = position + glm::vec2{ size.x, 0.0f };
-		Vertices[VertexCount + 1].Color = color;
+		s_Vertices[s_VertexCount + 1].Position = position + glm::vec2{ size.x, 0.0f };
+		s_Vertices[s_VertexCount + 1].Color = color;
 
-		Vertices[VertexCount + 2].Position = position + glm::vec2{ size.x, size.y };
-		Vertices[VertexCount + 2].Color = color;
+		s_Vertices[s_VertexCount + 2].Position = position + glm::vec2{ size.x, size.y };
+		s_Vertices[s_VertexCount + 2].Color = color;
 
-		Vertices[VertexCount + 3].Position = position + glm::vec2{ 0.0f, size.y };
-		Vertices[VertexCount + 3].Color = color;
+		s_Vertices[s_VertexCount + 3].Position = position + glm::vec2{ 0.0f, size.y };
+		s_Vertices[s_VertexCount + 3].Color = color;
 
 		// Indices
-		Indices[IndexCount] = VertexCount;
-		Indices[IndexCount + 1] = VertexCount + 1;
-		Indices[IndexCount + 2] = VertexCount + 2;
-		Indices[IndexCount + 3] = VertexCount + 2;
-		Indices[IndexCount + 4] = VertexCount + 3;
-		Indices[IndexCount + 5] = VertexCount;
+		s_Indices[s_IndexCount] = s_VertexCount;
+		s_Indices[s_IndexCount + 1] = s_VertexCount + 1;
+		s_Indices[s_IndexCount + 2] = s_VertexCount + 2;
+		s_Indices[s_IndexCount + 3] = s_VertexCount + 2;
+		s_Indices[s_IndexCount + 4] = s_VertexCount + 3;
+		s_Indices[s_IndexCount + 5] = s_VertexCount;
 
-		VertexCount += 4;
-		IndexCount += 6;
+		s_VertexCount += 4;
+		s_IndexCount += 6;
 
-		Stats.Vertices += 4;
-		Stats.Indices += 6;
-		Stats.Quads += 1;
+		s_Statistics.Vertices += 4;
+		s_Statistics.Indices += 6;
+		s_Statistics.Quads += 1;
 	}
 
 	void Renderer::DrawCircle(glm::vec2 position, float radius, glm::vec3 color, uint32_t precision) {
@@ -276,46 +273,46 @@ void main()
 		constexpr float PI = 3.14159265358979323846f;
 
 		// Check if there are enough space
-		if (VertexCount + precision + 1 > MAX_VERTICES || IndexCount + 3 * precision > MAX_INDICES) {
+		if (s_VertexCount + precision + 1 > MAX_VERTICES || s_IndexCount + 3 * precision > MAX_INDICES) {
 			Renderer::End();
 			Renderer::Begin();
 		}
 
 		// Vertices
-		Vertices[VertexCount].Position = position;
-		Vertices[VertexCount].Color = color;
+		s_Vertices[s_VertexCount].Position = position;
+		s_Vertices[s_VertexCount].Color = color;
 
 		for (uint32_t i = 1; i <= precision; i++) {
-			Vertices[VertexCount + i].Position = {
+			s_Vertices[s_VertexCount + i].Position = {
 				position.x + radius * std::cos(2 * PI / precision * (i - 1)),
 				position.y + radius * std::sin(2 * PI / precision * (i - 1)),
 			};
-			Vertices[VertexCount + i].Color = color;
+			s_Vertices[s_VertexCount + i].Color = color;
 		}
 
 		// Indices
 		for (uint32_t i = 0; i < precision - 1; i++) {
-			Indices[IndexCount + i * 3] = VertexCount;
-			Indices[IndexCount + i * 3 + 1] = VertexCount + i + 1;
-			Indices[IndexCount + i * 3 + 2] = VertexCount + i + 2;
+			s_Indices[s_IndexCount + i * 3] = s_VertexCount;
+			s_Indices[s_IndexCount + i * 3 + 1] = s_VertexCount + i + 1;
+			s_Indices[s_IndexCount + i * 3 + 2] = s_VertexCount + i + 2;
 		}
 
-		Indices[IndexCount + (precision - 1) * 3] = VertexCount;
-		Indices[IndexCount + (precision - 1) * 3 + 1] = VertexCount + precision;
-		Indices[IndexCount + (precision - 1) * 3 + 2] = VertexCount + 1;
+		s_Indices[s_IndexCount + (precision - 1) * 3] = s_VertexCount;
+		s_Indices[s_IndexCount + (precision - 1) * 3 + 1] = s_VertexCount + precision;
+		s_Indices[s_IndexCount + (precision - 1) * 3 + 2] = s_VertexCount + 1;
 
-		VertexCount += 1 + precision;
-		IndexCount += 3 * precision;
+		s_VertexCount += 1 + precision;
+		s_IndexCount += 3 * precision;
 
-		Stats.Vertices += 1 + precision;
-		Stats.Indices += 3 * precision;
-		Stats.Circles += 1;
+		s_Statistics.Vertices += 1 + precision;
+		s_Statistics.Indices += 3 * precision;
+		s_Statistics.Circles += 1;
 	}
 
 	void Renderer::DrawQuad(glm::vec2 position, glm::vec2 size, Texture const& texture, glm::vec4 subrect)
 	{
 		// Check if there are enough space
-		if (VertexCount + 4 > MAX_VERTICES || IndexCount + 6 > MAX_INDICES)
+		if (s_VertexCount + 4 > MAX_VERTICES || s_IndexCount + 6 > MAX_INDICES)
 		{
 			Renderer::End();
 			Renderer::Begin();
@@ -323,61 +320,61 @@ void main()
 
 		// Find texture
 		float textureID = -1.0f;
-		for (uint32_t i = 0; i < TextureCount; i++)
+		for (uint32_t i = 0; i < s_TextureCount; i++)
 		{
-			if (Textures[i] == &texture)
+			if (s_Textures[i] == &texture)
 				textureID = i;
 		}
 
 		if (textureID == -1.0f)
 		{
 			// Check if there is enough place for the texture
-			if (TextureCount + 1 > MAX_TEXTURES)
+			if (s_TextureCount + 1 > MAX_TEXTURES)
 			{
 				Renderer::End();
 				Renderer::Begin();
 			}
 
-			Textures[TextureCount] = &texture;
-			textureID = TextureCount;
-			TextureCount++;
+			s_Textures[s_TextureCount] = &texture;
+			textureID = s_TextureCount;
+			s_TextureCount++;
 		}
 
 
 		// Vertices
-		Vertices[VertexCount].Position = position;
-		Vertices[VertexCount].Texture = { subrect.x, subrect.y, textureID + 2.0f };
+		s_Vertices[s_VertexCount].Position = position;
+		s_Vertices[s_VertexCount].Texture = { subrect.x, subrect.y, textureID + 2.0f };
 
-		Vertices[VertexCount + 1].Position = position + glm::vec2{ size.x, 0.0f };
-		Vertices[VertexCount + 1].Texture = { subrect.x + subrect.z, subrect.y, textureID + 2.0f };
+		s_Vertices[s_VertexCount + 1].Position = position + glm::vec2{ size.x, 0.0f };
+		s_Vertices[s_VertexCount + 1].Texture = { subrect.x + subrect.z, subrect.y, textureID + 2.0f };
 
-		Vertices[VertexCount + 2].Position = position + glm::vec2{ size.x, size.y };
-		Vertices[VertexCount + 2].Texture = { subrect.x + subrect.z, subrect.y + subrect.w, textureID + 2.0f };
+		s_Vertices[s_VertexCount + 2].Position = position + glm::vec2{ size.x, size.y };
+		s_Vertices[s_VertexCount + 2].Texture = { subrect.x + subrect.z, subrect.y + subrect.w, textureID + 2.0f };
 
-		Vertices[VertexCount + 3].Position = position + glm::vec2{ 0.0f, size.y };
-		Vertices[VertexCount + 3].Texture = { subrect.x, subrect.y + subrect.w, textureID + 2.0f };
+		s_Vertices[s_VertexCount + 3].Position = position + glm::vec2{ 0.0f, size.y };
+		s_Vertices[s_VertexCount + 3].Texture = { subrect.x, subrect.y + subrect.w, textureID + 2.0f };
 
 		// Indices
-		Indices[IndexCount] = VertexCount;
-		Indices[IndexCount + 1] = VertexCount + 1;
-		Indices[IndexCount + 2] = VertexCount + 2;
-		Indices[IndexCount + 3] = VertexCount + 2;
-		Indices[IndexCount + 4] = VertexCount + 3;
-		Indices[IndexCount + 5] = VertexCount;
+		s_Indices[s_IndexCount] = s_VertexCount;
+		s_Indices[s_IndexCount + 1] = s_VertexCount + 1;
+		s_Indices[s_IndexCount + 2] = s_VertexCount + 2;
+		s_Indices[s_IndexCount + 3] = s_VertexCount + 2;
+		s_Indices[s_IndexCount + 4] = s_VertexCount + 3;
+		s_Indices[s_IndexCount + 5] = s_VertexCount;
 
-		VertexCount += 4;
-		IndexCount += 6;
+		s_VertexCount += 4;
+		s_IndexCount += 6;
 
-		Stats.Vertices += 4;
-		Stats.Indices += 6;
-		Stats.Quads += 1;
+		s_Statistics.Vertices += 4;
+		s_Statistics.Indices += 6;
+		s_Statistics.Quads += 1;
 	}
 
 	Renderer::Statistics Renderer::GetStatistics() {
-		return Stats;
+		return s_Statistics;
 	}
 
 	void Renderer::ResetStatistics() {
-		Stats = Statistics{};
+		s_Statistics = Statistics{};
 	}
 }

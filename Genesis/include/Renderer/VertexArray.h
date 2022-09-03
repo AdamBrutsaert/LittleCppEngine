@@ -8,11 +8,17 @@ namespace Genesis
 	class VertexArray
 	{
 	public:
-		VertexArray(VertexBuffer const& vertexBuffer, IndexBuffer const& indexBuffer);
+		static std::shared_ptr<VertexArray> Create(std::shared_ptr<VertexBuffer> const& vertexBuffer,
+												   std::shared_ptr<IndexBuffer> const& indexBuffer);
+
+		static void Unbind();
+
+	public:
+		VertexArray(std::shared_ptr<VertexBuffer> const& vertexBuffer,
+					std::shared_ptr<IndexBuffer> const& indexBuffer);
 		~VertexArray();
 
 		void bind() const;
-		static void Unbind();
 
 	private:
 		uint32_t m_VertexArrayID;

@@ -38,5 +38,5 @@ void SandboxScene::onUpdate(float dt)
 
 	auto stats = Renderer::GetStatistics();
 
-	std::cout << "Draw Calls : " << stats.DrawCalls << "\r";
+	std::cout << "\rDraw Calls : " << stats.DrawCalls;
 }
