@@ -9,9 +9,8 @@ int main()
 	auto app = CreateApplication();
 
 	Genesis::Renderer::Initialize();
-
 	app->run();
-	delete app;
-
 	Genesis::Renderer::Shutdown();
+	
+	delete app;
 }

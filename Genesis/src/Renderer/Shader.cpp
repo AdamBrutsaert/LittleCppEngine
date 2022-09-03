@@ -9,12 +9,10 @@
 
 namespace Genesis
 {
-	static uint32_t CompileShader(std::string const& source, GLenum type)
+	static uint32_t CompileShader(const char* source, GLenum type)
 	{
-		const char* content = source.c_str();
-
 		uint32_t shader = glCreateShader(type);
-		glShaderSource(shader, 1, &content, nullptr);
+		glShaderSource(shader, 1, &source, nullptr);
 		glCompileShader(shader);
 
 		int success;
@@ -33,7 +31,7 @@ namespace Genesis
 		return shader;
 	}
 
-	Shader::Shader(std::string const& vertexSource, std::string const& fragmentSource)
+	Shader::Shader(const char* vertexSource, const char* fragmentSource)
 	{
 		// Shaders
 		auto vertex = CompileShader(vertexSource, GL_VERTEX_SHADER);

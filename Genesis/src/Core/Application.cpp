@@ -1,6 +1,7 @@
 #include "Core/Application.h"
 
 #include <chrono>
+#include <stdexcept>
 
 #include <glad/glad.h>
 
@@ -79,4 +80,3 @@ namespace Genesis
 		m_Scene->onDetach();
 	}
 }
-

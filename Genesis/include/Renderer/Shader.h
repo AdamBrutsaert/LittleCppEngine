@@ -7,7 +7,7 @@ namespace Genesis
 {
 	class Shader {
 	public:
-		Shader(std::string const& vertexSource, std::string const& fragmentSource);
+		Shader(const char* vertexSource, const char* fragmentSource);
 		~Shader();
 
 		Shader(const Shader&) = delete;

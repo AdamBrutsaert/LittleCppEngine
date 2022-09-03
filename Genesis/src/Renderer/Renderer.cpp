@@ -1,6 +1,5 @@
 #include "Renderer/Renderer.h"
 
-#include <memory>
 #include <array>
 
 #include <glad/glad.h>
@@ -19,7 +18,7 @@ namespace Genesis
 		};
 	};
 
-	static std::string s_VertexSource = R"(
+	static const char* s_VertexSource = R"(
 #version 330 core
 
 layout (location = 0) in vec2 vPosition;
@@ -36,7 +35,7 @@ void main()
 }
 )";
 
-	static std::string s_FragmentSource = R"(
+	static const char* s_FragmentSource = R"(
 #version 330 core
 
 uniform sampler2D uTextures[16];
@@ -49,7 +48,56 @@ void main()
 {
 	if (fColor.z > 1.0)
 	{
-		Color = texture(uTextures[int(fColor.z) - 2], fColor.xy);
+		switch (int(fColor.z) - 2) {
+		case 0:
+			Color = texture(uTextures[0], fColor.xy);
+			break;
+		case 1:
+			Color = texture(uTextures[1], fColor.xy);
+			break;
+		case 2:
+			Color = texture(uTextures[2], fColor.xy);
+			break;
+		case 3:
+			Color = texture(uTextures[3], fColor.xy);
+			break;
+		case 4:
+			Color = texture(uTextures[4], fColor.xy);
+			break;
+		case 5:
+			Color = texture(uTextures[5], fColor.xy);
+			break;
+		case 6:
+			Color = texture(uTextures[6], fColor.xy);
+			break;
+		case 7:
+			Color = texture(uTextures[7], fColor.xy);
+			break;
+		case 8:
+			Color = texture(uTextures[8], fColor.xy);
+			break;
+		case 9:
+			Color = texture(uTextures[9], fColor.xy);
+			break;
+		case 10:
+			Color = texture(uTextures[10], fColor.xy);
+			break;
+		case 11:
+			Color = texture(uTextures[11], fColor.xy);
+			break;
+		case 12:
+			Color = texture(uTextures[12], fColor.xy);
+			break;
+		case 13:
+			Color = texture(uTextures[13], fColor.xy);
+			break;
+		case 14:
+			Color = texture(uTextures[14], fColor.xy);
+			break;
+		default:
+			Color = texture(uTextures[15], fColor.xy);
+			break;
+		}
 	}
 	else 
 	{
@@ -58,7 +106,7 @@ void main()
 }
 )";
 
-	static std::unique_ptr<Shader> s_Shader;
+	static Shader* s_Shader;
 
 	static constexpr uint32_t MAX_VERTICES = 50'000;
 	static constexpr uint32_t MAX_INDICES = 200'000;
@@ -82,7 +130,7 @@ void main()
 
 	void Renderer::Initialize()
 	{
-		s_Shader = std::make_unique<Shader>(s_VertexSource, s_FragmentSource);
+		s_Shader = new Shader(s_VertexSource, s_FragmentSource);
 	
 		// Preparing textures
 		{
@@ -122,6 +170,8 @@ void main()
 
 	void Renderer::Shutdown()
 	{
+		delete s_Shader;
+
 		glDeleteBuffers(1, &IndexBuffer);
 		glDeleteBuffers(1, &VertexBuffer);
 		glDeleteVertexArrays(1, &VertexArray);
