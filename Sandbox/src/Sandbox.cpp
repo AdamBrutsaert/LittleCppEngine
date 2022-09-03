@@ -1,20 +1,20 @@
 #include <Genesis.h>
 
-#include <iostream>
-
 using namespace Genesis;
 
 class SandboxScene : public Scene
 {
 public:
-	SandboxScene() : m_Ticks(0), m_Elapsed(0) {}
+	SandboxScene() : m_Ticks(0), m_Elapsed(0), m_Texture(nullptr) {}
 
 	virtual void onAttach() override
 	{
+		m_Texture = new Texture("res/conveyor_0.png");
 	}
 
 	virtual void onDetach() override
 	{
+		delete m_Texture;
 	}
 
 	virtual void onUpdate(float dt) override
@@ -29,14 +29,16 @@ public:
 		}
 
 		Renderer::Begin();
-		Renderer::DrawQuad({ -0.5f, -0.5f }, { 1.0f, 1.0f }, { 0.92f, 0.53f, 1.0f });
-		Renderer::DrawCircle({ 0.5f, 0.5f }, 0.25f, { 1.0f, 0.92f, 0.53f });
+		Renderer::DrawQuad({ -0.5f, -0.5f }, { 1.0f, 1.0f }, *m_Texture);
+		Renderer::DrawCircle({ 0.5f, 0.5f }, 0.5f, { 1.0f, 0.92f, 0.53f });
 		Renderer::End();
 	}
 
 private:
 	float m_Elapsed;
 	uint32_t m_Ticks;
+
+	Texture* m_Texture;
 };
 
 class Sandbox : public Application

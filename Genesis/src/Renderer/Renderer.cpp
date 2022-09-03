@@ -6,18 +6,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Renderer/Shader.h"
+#include "Renderer/VertexArray.h"
 
 namespace Genesis
 {
-	struct Vertex {
-		glm::vec2 Position;
-
-		union {
-			glm::vec3 Color;
-			glm::vec3 Texture;
-		};
-	};
-
 	static const char* s_VertexSource = R"(
 #version 330 core
 
@@ -112,14 +104,14 @@ void main()
 	static constexpr uint32_t MAX_INDICES = 200'000;
 	static constexpr uint32_t MAX_TEXTURES = 16; // OpenGL3 ensures that there is at least 16 textures availables
 
-	static uint32_t VertexArray = 0;
-	static uint32_t VertexBuffer = 0;
-	static uint32_t IndexBuffer = 0;
+	static VertexBuffer* s_VertexBuffer = nullptr;
+	static IndexBuffer* s_IndexBuffer = nullptr;
+	static VertexArray* s_VertexArray = nullptr;
 
 	// Maybe batch Vertices and Indices together into a single array
 	static Vertex* Vertices = nullptr;
 	static uint32_t* Indices = nullptr;
-	static std::array<uint32_t, MAX_TEXTURES> Textures;
+	static std::array<Texture const*, MAX_TEXTURES> Textures = { nullptr };
 
 	static uint32_t VertexCount = 0;
 	static uint32_t IndexCount = 0;
@@ -134,7 +126,7 @@ void main()
 	
 		// Preparing textures
 		{
-			int samplers[16];
+			int32_t samplers[16];
 			for (auto i = 0; i < 16; i++) samplers[i] = i;
 			
 			s_Shader->bind();
@@ -145,36 +137,18 @@ void main()
 		Vertices = new Vertex[MAX_VERTICES];
 		Indices = new uint32_t[MAX_INDICES];
 
-		glGenVertexArrays(1, &VertexArray);
-		glBindVertexArray(VertexArray);
-
-			glGenBuffers(1, &VertexBuffer);
-			glBindBuffer(GL_ARRAY_BUFFER, VertexBuffer);
-			glBufferData(GL_ARRAY_BUFFER, MAX_VERTICES * sizeof(Vertex), nullptr, GL_DYNAMIC_DRAW);
-
-				glEnableVertexAttribArray(0);
-				glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, Position)));
-
-				glEnableVertexAttribArray(1);
-				glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, Color)));
-
-			glGenBuffers(1, &IndexBuffer);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IndexBuffer);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, MAX_INDICES * sizeof(uint32_t), nullptr, GL_DYNAMIC_DRAW);
-
-		glBindVertexArray(0);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		s_VertexBuffer = new VertexBuffer(MAX_VERTICES, GL_DYNAMIC_DRAW);
+		s_IndexBuffer = new IndexBuffer(MAX_INDICES, GL_DYNAMIC_DRAW);
+		s_VertexArray = new VertexArray(*s_VertexBuffer, *s_IndexBuffer);
 	}
 
 	void Renderer::Shutdown()
 	{
 		delete s_Shader;
 
-		glDeleteBuffers(1, &IndexBuffer);
-		glDeleteBuffers(1, &VertexBuffer);
-		glDeleteVertexArrays(1, &VertexArray);
+		delete s_VertexBuffer;
+		delete s_IndexBuffer;
+		delete s_VertexArray;
 
 		delete[] Vertices;
 		delete[] Indices;
@@ -193,28 +167,25 @@ void main()
 
 			s_Shader->setUniformMat4fv("uViewProjection", glm::ortho(-16.0f / 9.0f, 16.0f / 9.0f, -1.0f, 1.0f));
 
-			glBindVertexArray(VertexArray);
+			s_VertexArray->bind();
+				
+				s_VertexBuffer->bind();
+				s_VertexBuffer->setData(Vertices, VertexCount);
 
-				// Vertex Buffer
-				glBindBuffer(GL_ARRAY_BUFFER, VertexBuffer);
-				glBufferSubData(GL_ARRAY_BUFFER, 0, VertexCount * sizeof(Vertex), Vertices);
-
-				// Index Buffer
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IndexBuffer);
-				glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, IndexCount * sizeof(uint32_t), Indices);
+				s_IndexBuffer->bind();
+				s_IndexBuffer->setData(Indices, IndexCount);
 
 				// Textures
 				for (uint32_t i = 0; i < TextureCount; i++) {
-					glActiveTexture(GL_TEXTURE0 + i);
-					glBindTexture(GL_TEXTURE_2D, Textures[i]);
+					Textures[i]->bind(i);
 				}
 
 				glDrawElements(GL_TRIANGLES, IndexCount, GL_UNSIGNED_INT, nullptr);
 
-			glBindVertexArray(0);
+			VertexArray::Unbind();
 
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			VertexBuffer::Unbind();
+			IndexBuffer::Unbind();
 
 		Shader::Unbind();
 
@@ -331,7 +302,7 @@ void main()
 		Stats.Circles += 1;
 	}
 
-	void Renderer::DrawQuad(glm::vec2 position, glm::vec2 size, uint32_t texture, glm::vec4 subrect)
+	void Renderer::DrawQuad(glm::vec2 position, glm::vec2 size, Texture const& texture, glm::vec4 subrect)
 	{
 		// Check if there are enough space
 		if (VertexCount + 4 > MAX_VERTICES || IndexCount + 6 > MAX_INDICES)
@@ -344,7 +315,7 @@ void main()
 		float textureID = -1.0f;
 		for (uint32_t i = 0; i < TextureCount; i++)
 		{
-			if (Textures[i] == texture)
+			if (Textures[i] == &texture)
 				textureID = i;
 		}
 
@@ -357,7 +328,7 @@ void main()
 				Renderer::Begin();
 			}
 
-			Textures[TextureCount] = texture;
+			Textures[TextureCount] = &texture;
 			textureID = TextureCount;
 			TextureCount++;
 		}

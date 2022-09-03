@@ -9,7 +9,8 @@ project "Genesis"
         "include", 
         "thirdparties/glfw/include",
         "thirdparties/glad/include",
-        "thirdparties/glm"
+        "thirdparties/glm",
+        "thirdparties/stb"
     }
 
     files { "include/**.h", "src/**.cpp"}
@@ -26,3 +27,4 @@ project "Genesis"
 
 include "thirdparties/glfw"
 include "thirdparties/glad"
+include "thirdparties/stb"
