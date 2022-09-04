@@ -15,7 +15,7 @@ private:
 	float m_Elapsed;
 	uint32_t m_Ticks;
 
-	Genesis::Texture* m_Texture;
+	std::shared_ptr<Genesis::Texture> m_Texture;
 
 	Genesis::MessageSubscriber<Genesis::Message::WindowResize> m_Subscriber;
 	Genesis::MessageSubscriber<Genesis::Message::KeyPressed> m_Subscriber1;

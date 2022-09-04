@@ -10,7 +10,7 @@ SandboxScene::SandboxScene() : m_Ticks(0), m_Elapsed(0), m_Texture(nullptr)
 
 void SandboxScene::onAttach()
 {
-	m_Texture = new Texture("res/conveyor_0.png");
+	m_Texture = Texture::Create("res/conveyor_0.png");
 	m_Subscriber = MessageBus::Subscribe<Message::WindowResize>(
 		0, 
 		[](Message::WindowResize& m) { 
@@ -36,8 +36,10 @@ void SandboxScene::onAttach()
 
 void SandboxScene::onDetach()
 {
-	delete m_Texture;
+	m_Texture = nullptr;
 	MessageBus::Remove(0, m_Subscriber);
+	MessageBus::Remove(0, m_Subscriber1);
+	MessageBus::Remove(0, m_Subscriber2);
 }
 
 void SandboxScene::onUpdate(float dt)
@@ -54,7 +56,7 @@ void SandboxScene::onUpdate(float dt)
 	Renderer::ResetStatistics();
 
 	Renderer::Begin();
-	Renderer::DrawQuad({ -0.5f, -0.5f }, { 1.0f, 1.0f }, *m_Texture);
+	Renderer::DrawQuad({ -0.5f, -0.5f }, { 1.0f, 1.0f }, m_Texture);
 	Renderer::DrawCircle({ 0.5f, 0.5f }, 0.5f, { 1.0f, 0.92f, 0.53f });
 	Renderer::End();
 }

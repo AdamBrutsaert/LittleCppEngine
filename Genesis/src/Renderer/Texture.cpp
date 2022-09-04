@@ -29,15 +29,20 @@ namespace Genesis
 		glDeleteTextures(1, &m_TextureID);
 	}
 
-	void Texture::bind(uint32_t location) const
+	std::shared_ptr<Texture> Texture::Create(std::string const& path)
 	{
-		glActiveTexture(GL_TEXTURE0 + location);
-		glBindTexture(GL_TEXTURE_2D, m_TextureID);
+		return std::make_shared<Texture>(path);
 	}
 
 	void Texture::Unbind(uint32_t location)
 	{
 		glActiveTexture(GL_TEXTURE0 + location);
 		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	
+	void Texture::bind(uint32_t location) const
+	{
+		glActiveTexture(GL_TEXTURE0 + location);
+		glBindTexture(GL_TEXTURE_2D, m_TextureID);
 	}
 }

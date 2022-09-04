@@ -23,7 +23,7 @@ namespace Genesis
 		static void DrawCircle(glm::vec2 position, float radius, glm::vec3 color, uint32_t precision = 50u);
 
 		// Texturized
-		static void DrawQuad(glm::vec2 position, glm::vec2 size, Texture const& texture, glm::vec4 subrect = { 0.0f, 0.0f, 1.0f, 1.0f });
+		static void DrawQuad(glm::vec2 position, glm::vec2 size, std::shared_ptr<Texture> const& texture, glm::vec4 subrect = { 0.0f, 0.0f, 1.0f, 1.0f });
 
 		// Statistics
 		struct Statistics {

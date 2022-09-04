@@ -7,6 +7,7 @@
 
 #include "Renderer/Shader.h"
 #include "Renderer/VertexArray.h"
+#include "MessageBus/MessageBus.h"
 
 namespace Genesis
 {
@@ -110,7 +111,7 @@ void main()
 	// Maybe batch Vertices and Indices together into a single array
 	static Vertex* s_Vertices = nullptr;
 	static uint32_t* s_Indices = nullptr;
-	static std::array<Texture const*, MAX_TEXTURES> s_Textures = { nullptr };
+	static std::array<std::shared_ptr<Texture>, MAX_TEXTURES> s_Textures = { nullptr };
 
 	static uint32_t s_VertexCount = 0;
 	static uint32_t s_IndexCount = 0;
@@ -121,6 +122,13 @@ void main()
 
 	void Renderer::Initialize()
 	{
+		MessageBus::Subscribe<Message::WindowResize>(
+			0,
+			[](Message::WindowResize m) { 
+				glViewport(0, 0, m.width, m.height);
+			}
+		);
+
 		s_Shader = Shader::CreateFromSources(s_VertexSource, s_FragmentSource);
 	
 		// Preparing textures
@@ -309,7 +317,7 @@ void main()
 		s_Statistics.Circles += 1;
 	}
 
-	void Renderer::DrawQuad(glm::vec2 position, glm::vec2 size, Texture const& texture, glm::vec4 subrect)
+	void Renderer::DrawQuad(glm::vec2 position, glm::vec2 size, std::shared_ptr<Texture> const& texture, glm::vec4 subrect)
 	{
 		// Check if there are enough space
 		if (s_VertexCount + 4 > MAX_VERTICES || s_IndexCount + 6 > MAX_INDICES)
@@ -322,7 +330,7 @@ void main()
 		float textureID = -1.0f;
 		for (uint32_t i = 0; i < s_TextureCount; i++)
 		{
-			if (s_Textures[i] == &texture)
+			if (s_Textures[i] == texture)
 				textureID = i;
 		}
 
@@ -335,7 +343,7 @@ void main()
 				Renderer::Begin();
 			}
 
-			s_Textures[s_TextureCount] = &texture;
+			s_Textures[s_TextureCount] = texture;
 			textureID = s_TextureCount;
 			s_TextureCount++;
 		}
