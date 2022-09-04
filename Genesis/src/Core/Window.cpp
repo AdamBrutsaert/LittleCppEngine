@@ -1,8 +1,11 @@
 #include "Core/Window.h"
 
+#include <stdexcept>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <stdexcept>
+
+#include "MessageBus/MessageBus.h"
 
 namespace Genesis 
 {
@@ -38,6 +41,20 @@ namespace Genesis
 		}
 	}
 
+	static void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
+	{
+		MessageBus::Send<Message::WindowResize>(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+	}
+
+	static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+	{
+		if (action == GLFW_PRESS) {
+			MessageBus::Send<Message::KeyPressed>(static_cast<uint32_t>(key));
+		} else if (action == GLFW_RELEASE) {
+			MessageBus::Send<Message::KeyReleased>(static_cast<uint32_t>(key));
+		}
+	}
+
 	Window::Window(uint32_t width, uint32_t height, std::string const& title)
 	{
 		InitializeGLFW();
@@ -52,6 +69,9 @@ namespace Genesis
 		if (m_Window == nullptr) {
 			throw std::runtime_error("Failed to create Window!");
 		}
+
+		glfwSetFramebufferSizeCallback(static_cast<GLFWwindow*>(m_Window), FramebufferSizeCallback);
+		glfwSetKeyCallback(static_cast<GLFWwindow*>(m_Window), KeyCallback);
 
 		glfwMakeContextCurrent(static_cast<GLFWwindow*>(m_Window));
 		InitializeGLAD();

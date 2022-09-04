@@ -1,5 +1,7 @@
 #pragma once
 
+#include "MessageBus/MessageBus.h"
+
 namespace Genesis
 {
 	class Scene {

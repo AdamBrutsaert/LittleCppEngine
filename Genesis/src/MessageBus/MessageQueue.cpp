@@ -3,7 +3,7 @@
 namespace Genesis {
 
     MessageQueue::MessageQueue(std::size_t capacity)
-        : m_Capacity(capacity), m_Length(0), m_Cursor(0)
+        : m_Capacity(capacity), m_Length(0), m_Cursor(0), m_Queue(nullptr)
     {
         if (m_Capacity != 0) {
             m_Queue = static_cast<uint8_t*>(std::malloc(m_Capacity));
