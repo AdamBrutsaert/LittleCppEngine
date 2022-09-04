@@ -16,4 +16,6 @@ private:
 	uint32_t m_Ticks;
 
 	Genesis::Texture* m_Texture;
+
+	Genesis::MessageSubscriber<int> m_Subscriber;
 };

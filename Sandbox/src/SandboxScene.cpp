@@ -11,13 +11,13 @@ SandboxScene::SandboxScene() : m_Ticks(0), m_Elapsed(0), m_Texture(nullptr)
 void SandboxScene::onAttach()
 {
 	m_Texture = new Texture("res/conveyor_0.png");
-	MessageBus::Subscribe<int>([](int& a) { std::cout << "[0] Received : " << a << std::endl; });
-	MessageBus::Register<int>(MakeMessageSubscriber<int>([](int& a) { std::cout << "[1] Received : " << a << std::endl; }));
+	m_Subscriber = MessageBus::Subscribe<int>(1, [](int& a) { std::cout << "[1] Received : " << a << std::endl; });
 }
 
 void SandboxScene::onDetach()
 {
 	delete m_Texture;
+	MessageBus::Remove(1, m_Subscriber);
 }
 
 void SandboxScene::onUpdate(float dt)

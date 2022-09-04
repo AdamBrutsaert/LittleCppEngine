@@ -2,6 +2,7 @@
 
 #include <map>
 #include <vector>
+#include <algorithm>
 
 #include "Message.h"
 #include "MessageQueue.h"
@@ -12,22 +13,31 @@ namespace Genesis {
     class MessageBus {
     public:
         template <typename M> 
-        static void Register(MessageSubscriber<M> const& subscriber) {
-            s_Subscribers[GetMessageID<M>()].push_back(subscriber);
+        static void Register(uint32_t priority, MessageSubscriber<M> const& subscriber) {
+            if (s_Subscribers.size() <= priority) {
+                s_Subscribers.resize(priority + 1);
+            }
+            s_Subscribers[priority][GetMessageID<M>()].push_back(subscriber);
         }
 
         template <typename M, typename F> 
-        static MessageSubscriber<M> Subscribe(F&& func) {
+        static MessageSubscriber<M> Subscribe(uint32_t priority, F&& func) {
             auto subscriber = MakeMessageSubscriber<M, F>(std::forward<F>(func));
-            Register(subscriber);
+            Register(priority, subscriber);
             return subscriber;
         }
 
         template <typename M> 
-        static void Remove(MessageSubscriber<M> const& subscriber) {
-            auto &v = s_Subscribers[GetMessageID<M>()];
-            // TODO - Swap to the end and pop instead
-            v.erase(std::remove(v.begin(), v.end(), subscriber), v.end());
+        static void Remove(uint32_t priority, MessageSubscriber<M> const& subscriber) {
+            if (s_Subscribers.size() <= priority) return;
+
+            auto &v = s_Subscribers[priority][GetMessageID<M>()];
+
+            auto it = std::find(v.begin(), v.end(), subscriber);
+            if (it != v.end()) {
+                std::iter_swap(it, v.end() - 1);
+                v.pop_back();
+            }
         }
 
         template <typename M> 
@@ -46,7 +56,7 @@ namespace Genesis {
 
 
         // TODO - Add priorities
-        static std::map<MessageID, std::vector<std::shared_ptr<MessageCallable>>> s_Subscribers;
+        static std::vector<std::map<MessageID, std::vector<std::shared_ptr<MessageCallable>>>> s_Subscribers;
         static MessageQueue s_Queue;
     };
 
