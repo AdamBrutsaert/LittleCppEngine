@@ -2,6 +2,11 @@
 
 #include <Genesis.h>
 
+struct MyMessage
+{
+	uint32_t value;
+};
+
 class SandboxScene : public Genesis::Scene
 {
 public:
@@ -17,5 +22,6 @@ private:
 
 	Genesis::Texture* m_Texture;
 
-	Genesis::MessageSubscriber<int> m_Subscriber;
+	Genesis::MessageSubscriber<MyMessage> m_Subscriber0;
+	Genesis::MessageSubscriber<MyMessage> m_Subscriber1;
 };

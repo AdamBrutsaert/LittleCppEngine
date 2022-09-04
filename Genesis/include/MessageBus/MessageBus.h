@@ -3,6 +3,7 @@
 #include <map>
 #include <vector>
 #include <algorithm>
+#include <type_traits>
 
 #include "Message.h"
 #include "MessageQueue.h"
@@ -41,21 +42,21 @@ namespace Genesis {
         }
 
         template <typename M> 
-        static void Send(M&& msg) {
-            s_Queue.push({&msg, sizeof(msg), GetMessageID<M>()});
+        static void Send(M const& msg) {
+            s_Queue.push({&const_cast<M&>(msg), sizeof(msg), GetMessageID<M>()});
         }
 
-        template <typename M, typename... Args> 
+        template <typename M, typename... Args>
         static void Send(Args&&... args) {
-            Send<M>({std::forward<Args>(args)...});
+            Send<M>({ std::forward<Args>(args)... });
         }
+
+        static void PreventPropagation();
 
     private:
         friend class Application;
         static void Dispatch();
 
-
-        // TODO - Add priorities
         static std::vector<std::map<MessageID, std::vector<std::shared_ptr<MessageCallable>>>> s_Subscribers;
         static MessageQueue s_Queue;
     };
