@@ -15,9 +15,6 @@ private:
 	float m_Elapsed;
 	uint32_t m_Ticks;
 
+	Genesis::OrthographicCameraController m_CameraController;
 	std::shared_ptr<Genesis::Texture> m_Texture;
-
-	Genesis::MessageSubscriber<Genesis::Message::WindowResize> m_Subscriber;
-	Genesis::MessageSubscriber<Genesis::Message::KeyPressed> m_Subscriber1;
-	Genesis::MessageSubscriber<Genesis::Message::KeyReleased> m_Subscriber2;
 };

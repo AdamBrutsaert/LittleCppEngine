@@ -7,7 +7,7 @@ namespace Genesis {
     class MessageCallable {
     public:
         virtual ~MessageCallable() = default;
-        virtual void operator()(void*) const = 0;
+        virtual void operator()(void const*) const = 0;
     };
 
     template <typename M, typename F> class MessageCallableCaster : public MessageCallable {
@@ -16,9 +16,9 @@ namespace Genesis {
         {
         }
 
-        void operator()(void* msg) const 
+        void operator()(void const* msg) const
         {
-            m_Func(*static_cast<M*>(msg));
+            m_Func(*static_cast<M const*>(msg));
         }
 
     private:
@@ -51,13 +51,13 @@ namespace Genesis {
             m_Func = nullptr;
         }
 
-        void operator()(void* msg) const override final 
+        void operator()(void const* msg) const override final
         { 
             (*m_Func)(msg); 
         }
 
         // Utility function to allow us to pass argument of type M
-        void operator()(M& msg) const 
+        void operator()(M const& msg) const 
         { 
             (*m_Func)(&msg); 
         }

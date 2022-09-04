@@ -2,6 +2,8 @@
 
 #include <typeinfo>
 
+#include "Core/Key.h"
+
 namespace Genesis {
 
 	using MessageID = std::size_t;
@@ -18,11 +20,11 @@ namespace Genesis {
 		};
 
 		struct KeyPressed {
-			uint32_t key;
+			Key key;
 		};
 
 		struct KeyReleased {
-			uint32_t key;
+			Key key;
 		};
 	}
 }

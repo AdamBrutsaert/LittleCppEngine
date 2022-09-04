@@ -43,7 +43,7 @@ namespace Genesis {
 
         template <typename M> 
         static void Send(M const& msg) {
-            s_Queue.push({&const_cast<M&>(msg), sizeof(msg), GetMessageID<M>()});
+            s_Queue.push({&msg, sizeof(msg), GetMessageID<M>()});
         }
 
         template <typename M, typename... Args>

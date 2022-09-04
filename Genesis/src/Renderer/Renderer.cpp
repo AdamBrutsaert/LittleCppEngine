@@ -108,6 +108,8 @@ void main()
 	static std::shared_ptr<IndexBuffer> s_IndexBuffer = nullptr;
 	static std::shared_ptr<VertexArray> s_VertexArray = nullptr;
 
+	static glm::mat4 s_ProjectionViewMatrix{ 1.0f };
+
 	// Maybe batch Vertices and Indices together into a single array
 	static Vertex* s_Vertices = nullptr;
 	static uint32_t* s_Indices = nullptr;
@@ -167,11 +169,17 @@ void main()
 		s_TextureCount = 0;
 	}
 
+	void Renderer::Begin(glm::mat4 const& ProjectionViewMatrix)
+	{
+		s_ProjectionViewMatrix = ProjectionViewMatrix;
+		Renderer::Begin();
+	}
+
 	void Renderer::End()
 	{
 		s_Shader->bind();
 
-			s_Shader->setUniformMat4fv("uViewProjection", glm::ortho(-16.0f / 9.0f, 16.0f / 9.0f, -1.0f, 1.0f));
+			s_Shader->setUniformMat4fv("uViewProjection", s_ProjectionViewMatrix);
 
 			s_VertexArray->bind();
 				

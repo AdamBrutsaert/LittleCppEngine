@@ -10,7 +10,7 @@
 namespace Genesis {
 
     struct MessageQueueElement {
-        void* msg;
+        void const* msg;
         std::size_t size;
         MessageID id;
     };

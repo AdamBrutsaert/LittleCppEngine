@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 
 #include "MessageBus/MessageBus.h"
+#include "Core/Key.h"
 
 namespace Genesis 
 {
@@ -48,10 +49,93 @@ namespace Genesis
 
 	static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
+		Key trueKey = Key::UNKNOWN;
+		switch (key)
+		{
+		case 81:
+			trueKey = Key::A;
+			break;
+		case 66:
+			trueKey = Key::B;
+			break;
+		case 67:
+			trueKey = Key::C;
+			break;
+		case 68:
+			trueKey = Key::D;
+			break;
+		case 69:
+			trueKey = Key::E;
+			break;
+		case 70:
+			trueKey = Key::F;
+			break;
+		case 71:
+			trueKey = Key::G;
+			break;
+		case 72:
+			trueKey = Key::H;
+			break;
+		case 73:
+			trueKey = Key::I;
+			break;
+		case 74:
+			trueKey = Key::J;
+			break;
+		case 75:
+			trueKey = Key::K;
+			break;
+		case 76:
+			trueKey = Key::L;
+			break;
+		case 59:
+			trueKey = Key::M;
+			break;
+		case 78:
+			trueKey = Key::N;
+			break;
+		case 79:
+			trueKey = Key::O;
+			break;
+		case 80:
+			trueKey = Key::P;
+			break;
+		case 65:
+			trueKey = Key::Q;
+			break;
+		case 82:
+			trueKey = Key::R;
+			break;
+		case 83:
+			trueKey = Key::S;
+			break;
+		case 84:
+			trueKey = Key::T;
+			break;
+		case 85:
+			trueKey = Key::U;
+			break;
+		case 86:
+			trueKey = Key::V;
+			break;
+		case 90:
+			trueKey = Key::W;
+			break;
+		case 88:
+			trueKey = Key::X;
+			break;
+		case 89:
+			trueKey = Key::Y;
+			break;
+		case 87:
+			trueKey = Key::Z;
+			break;
+		}
+		
 		if (action == GLFW_PRESS) {
-			MessageBus::Send<Message::KeyPressed>(static_cast<uint32_t>(key));
+			MessageBus::Send<Message::KeyPressed>(trueKey);
 		} else if (action == GLFW_RELEASE) {
-			MessageBus::Send<Message::KeyReleased>(static_cast<uint32_t>(key));
+			MessageBus::Send<Message::KeyReleased>(trueKey);
 		}
 	}
 
@@ -85,6 +169,20 @@ namespace Genesis
 		s_WindowCount--;
 
 		ShutdownGLFW();
+	}
+
+	uint32_t Window::getWidth() const
+	{
+		int w, h;
+		glfwGetFramebufferSize(static_cast<GLFWwindow*>(m_Window), &w, &h);
+		return w;
+	}
+
+	uint32_t Window::getHeight() const
+	{
+		int w, h;
+		glfwGetFramebufferSize(static_cast<GLFWwindow*>(m_Window), &w, &h);
+		return h;
 	}
 
 	void Window::setTitle(std::string const& title)

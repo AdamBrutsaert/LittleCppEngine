@@ -4,42 +4,20 @@
 
 using namespace Genesis;
 
-SandboxScene::SandboxScene() : m_Ticks(0), m_Elapsed(0), m_Texture(nullptr) 
+SandboxScene::SandboxScene() : m_Ticks(0), m_Elapsed(0), m_Texture(nullptr), m_CameraController()
 {
 }
 
 void SandboxScene::onAttach()
 {
 	m_Texture = Texture::Create("res/conveyor_0.png");
-	m_Subscriber = MessageBus::Subscribe<Message::WindowResize>(
-		0, 
-		[](Message::WindowResize& m) { 
-			std::cout << "Window Resized : (" << m.width << ", " << m.height << ")" << std::endl;
-		}
-	);
-
-	m_Subscriber1 = MessageBus::Subscribe<Message::KeyPressed>(
-		0,
-		[](Message::KeyPressed& m) {
-			std::cout << "Key " << m.key << " pressed!" << std::endl;
-		}
-	);
-
-	m_Subscriber2 = MessageBus::Subscribe<Message::KeyReleased>(
-		0,
-		[](Message::KeyReleased& m) {
-			std::cout << "Key " << m.key << " released!" << std::endl;
-		}
-	);
-	
+	m_CameraController.onAttach();
 }
 
 void SandboxScene::onDetach()
 {
+	m_CameraController.onDetach();
 	m_Texture = nullptr;
-	MessageBus::Remove(0, m_Subscriber);
-	MessageBus::Remove(0, m_Subscriber1);
-	MessageBus::Remove(0, m_Subscriber2);
 }
 
 void SandboxScene::onUpdate(float dt)
@@ -55,7 +33,7 @@ void SandboxScene::onUpdate(float dt)
 
 	Renderer::ResetStatistics();
 
-	Renderer::Begin();
+	Renderer::Begin(m_CameraController.getCamera().getProjectionView());
 	Renderer::DrawQuad({ -0.5f, -0.5f }, { 1.0f, 1.0f }, m_Texture);
 	Renderer::DrawCircle({ 0.5f, 0.5f }, 0.5f, { 1.0f, 0.92f, 0.53f });
 	Renderer::End();

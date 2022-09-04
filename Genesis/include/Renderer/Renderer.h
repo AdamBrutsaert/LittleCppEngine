@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+
 #include "Texture.h"
 
 namespace Genesis
@@ -12,6 +13,7 @@ namespace Genesis
 		static void Shutdown();
 
 		static void Begin();
+		static void Begin(glm::mat4 const& ProjectionViewMatrix);
 		static void End();
 
 		static void SetClearColor(glm::vec4 color);
