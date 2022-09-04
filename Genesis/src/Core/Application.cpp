@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 #include "Renderer/Renderer.h"
+#include "MessageBus/MessageBus.h"
 
 namespace Genesis
 {
@@ -67,8 +68,9 @@ namespace Genesis
 				m_Scene->onAttach();
 			}
 
-			Renderer::Clear();
+			MessageBus::Dispatch();
 
+			Renderer::Clear();
 			m_Scene->onUpdate(dt);
 
 			m_Window->swapBuffers();

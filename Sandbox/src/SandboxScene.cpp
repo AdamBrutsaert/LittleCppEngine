@@ -11,6 +11,8 @@ SandboxScene::SandboxScene() : m_Ticks(0), m_Elapsed(0), m_Texture(nullptr)
 void SandboxScene::onAttach()
 {
 	m_Texture = new Texture("res/conveyor_0.png");
+	MessageBus::Subscribe<int>([](int& a) { std::cout << "[0] Received : " << a << std::endl; });
+	MessageBus::Register<int>(MakeMessageSubscriber<int>([](int& a) { std::cout << "[1] Received : " << a << std::endl; }));
 }
 
 void SandboxScene::onDetach()
@@ -36,7 +38,5 @@ void SandboxScene::onUpdate(float dt)
 	Renderer::DrawCircle({ 0.5f, 0.5f }, 0.5f, { 1.0f, 0.92f, 0.53f });
 	Renderer::End();
 
-	auto stats = Renderer::GetStatistics();
-
-	std::cout << "\rDraw Calls : " << stats.DrawCalls;
+	MessageBus::Send(3);
 }
