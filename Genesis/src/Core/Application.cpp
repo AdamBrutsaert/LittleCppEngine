@@ -74,6 +74,9 @@ namespace Genesis
 			Renderer::Clear();
 			m_Scene->onUpdate(dt);
 
+			for (auto it = m_Scene->m_Layers.rbegin(); it != m_Scene->m_Layers.rend(); it++)
+				(*it)->onUpdate(dt);
+
 			m_Window->swapBuffers();
 			Window::PollEvents();
 		}
@@ -81,5 +84,20 @@ namespace Genesis
 		m_Scene->onDetach();
 
 		Renderer::Shutdown();
+	}
+
+	void Application::PushLayer(std::shared_ptr<Layer> const& layer)
+	{
+		s_Instance->m_Scene->m_Layers.push_back(layer);
+		layer->onAttach();
+	}
+	
+	void Application::PopLayer()
+	{
+		auto size = s_Instance->m_Scene->m_Layers.size();
+		if (size > 0) {
+			s_Instance->m_Scene->m_Layers[size - 1]->onDetach();
+			s_Instance->m_Scene->m_Layers.pop_back();
+		}
 	}
 }

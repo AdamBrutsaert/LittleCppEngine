@@ -17,6 +17,9 @@ namespace Genesis
 		static std::shared_ptr<Window> const& GetWindow();
 		static void SetScene(std::shared_ptr<Scene> const& scene);
 		
+		static void PushLayer(std::shared_ptr<Layer> const& layer);
+		static void PopLayer();
+
 	private:
 		void run();
 

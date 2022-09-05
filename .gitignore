@@ -3,6 +3,9 @@ bin
 bin-int
 build
 
+# Logs
+logs
+
 # GNU Make
 Makefile
 
