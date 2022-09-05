@@ -18,6 +18,11 @@ namespace Genesis
 		return m_Projection * m_View;
 	}
 
+	float OrthographicCamera::getZoomLevel() const
+	{
+		return m_ZoomLevel;
+	}
+
 	void OrthographicCamera::setAspectRatio(float aspectRatio)
 	{
 		m_AspectRatio = aspectRatio;

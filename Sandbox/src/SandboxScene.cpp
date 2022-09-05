@@ -20,6 +20,8 @@ void SandboxScene::onDetach()
 
 void SandboxScene::onUpdate(float dt)
 {
+	m_CameraController.onUpdate(dt);
+
 	m_Ticks++;
 	m_Elapsed += dt;
 

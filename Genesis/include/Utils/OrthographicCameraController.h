@@ -11,6 +11,7 @@ namespace Genesis
 
 		void onAttach();
 		void onDetach();
+		void onUpdate(float dt);
 
 		OrthographicCamera const& getCamera();
 
@@ -18,5 +19,6 @@ namespace Genesis
 		OrthographicCamera m_Camera;
 
 		MessageSubscriber<Message::WindowResize> m_WindowResizeCallback;
+		MessageSubscriber<Message::MouseScroll> m_MouseScrollCallback;
 	};
 }

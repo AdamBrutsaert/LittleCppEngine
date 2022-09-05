@@ -35,4 +35,7 @@ namespace Genesis
 		Z,
 		LAST = Z
 	};
+
+	int32_t MapKeyToInt(Key key);
+	Key MapIntToKey(int32_t key);
 }

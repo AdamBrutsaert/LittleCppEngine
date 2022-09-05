@@ -10,6 +10,8 @@ namespace Genesis
 
 		glm::mat4 getProjectionView() const;
 
+		float getZoomLevel() const;
+
 		void setAspectRatio(float aspectRatio);
 		void setZoomLevel(float level);
 		void move(glm::vec2 offset);

@@ -3,6 +3,7 @@
 #include <typeinfo>
 
 #include "Core/Key.h"
+#include "Core/MouseButton.h"
 
 namespace Genesis {
 
@@ -25,6 +26,28 @@ namespace Genesis {
 
 		struct KeyReleased {
 			Key key;
+		};
+
+		struct KeyRepeat {
+			Key key;
+		};
+
+		struct MouseButtonPressed {
+			MouseButton button;
+		};
+		
+		struct MouseButtonReleased {
+			MouseButton button;
+		};
+
+		struct MouseMove {
+			int32_t x;
+			int32_t y;
+		};
+
+		struct MouseScroll {
+			double x;
+			double y;
 		};
 	}
 }

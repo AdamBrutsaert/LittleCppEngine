@@ -6,7 +6,7 @@
 #include <GLFW/glfw3.h>
 
 #include "MessageBus/MessageBus.h"
-#include "Core/Key.h"
+#include "Core/Input.h"
 
 namespace Genesis 
 {
@@ -49,94 +49,37 @@ namespace Genesis
 
 	static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
-		Key trueKey = Key::UNKNOWN;
-		switch (key)
+		switch (action)
 		{
-		case 81:
-			trueKey = Key::A;
+		case GLFW_PRESS:
+			MessageBus::Send<Message::KeyPressed>(MapIntToKey(key));
 			break;
-		case 66:
-			trueKey = Key::B;
+		case GLFW_RELEASE:
+			MessageBus::Send<Message::KeyReleased>(MapIntToKey(key));
 			break;
-		case 67:
-			trueKey = Key::C;
-			break;
-		case 68:
-			trueKey = Key::D;
-			break;
-		case 69:
-			trueKey = Key::E;
-			break;
-		case 70:
-			trueKey = Key::F;
-			break;
-		case 71:
-			trueKey = Key::G;
-			break;
-		case 72:
-			trueKey = Key::H;
-			break;
-		case 73:
-			trueKey = Key::I;
-			break;
-		case 74:
-			trueKey = Key::J;
-			break;
-		case 75:
-			trueKey = Key::K;
-			break;
-		case 76:
-			trueKey = Key::L;
-			break;
-		case 59:
-			trueKey = Key::M;
-			break;
-		case 78:
-			trueKey = Key::N;
-			break;
-		case 79:
-			trueKey = Key::O;
-			break;
-		case 80:
-			trueKey = Key::P;
-			break;
-		case 65:
-			trueKey = Key::Q;
-			break;
-		case 82:
-			trueKey = Key::R;
-			break;
-		case 83:
-			trueKey = Key::S;
-			break;
-		case 84:
-			trueKey = Key::T;
-			break;
-		case 85:
-			trueKey = Key::U;
-			break;
-		case 86:
-			trueKey = Key::V;
-			break;
-		case 90:
-			trueKey = Key::W;
-			break;
-		case 88:
-			trueKey = Key::X;
-			break;
-		case 89:
-			trueKey = Key::Y;
-			break;
-		case 87:
-			trueKey = Key::Z;
+		case GLFW_REPEAT:
+			MessageBus::Send<Message::KeyRepeat>(MapIntToKey(key));
 			break;
 		}
-		
+	}
+
+	static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+	{
 		if (action == GLFW_PRESS) {
-			MessageBus::Send<Message::KeyPressed>(trueKey);
-		} else if (action == GLFW_RELEASE) {
-			MessageBus::Send<Message::KeyReleased>(trueKey);
+			MessageBus::Send<Message::MouseButtonPressed>(MapIntToMouseButton(button));
+		} else {
+			MessageBus::Send<Message::MouseButtonReleased>(MapIntToMouseButton(button));
 		}
+	}
+
+	static void MousePositionCallback(GLFWwindow* window, double xpos, double ypos)
+	{
+		MessageBus::Send<Message::MouseMove>(static_cast<int32_t>(xpos), static_cast<int32_t>(ypos));
+	}
+
+	void MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+	{
+		MessageBus::Send<Message::MouseScroll>(xoffset, yoffset);
 	}
 
 	Window::Window(uint32_t width, uint32_t height, std::string const& title)
@@ -156,6 +99,9 @@ namespace Genesis
 
 		glfwSetFramebufferSizeCallback(static_cast<GLFWwindow*>(m_Window), FramebufferSizeCallback);
 		glfwSetKeyCallback(static_cast<GLFWwindow*>(m_Window), KeyCallback);
+		glfwSetMouseButtonCallback(static_cast<GLFWwindow*>(m_Window), MouseButtonCallback);
+		glfwSetCursorPosCallback(static_cast<GLFWwindow*>(m_Window), MousePositionCallback);
+		glfwSetScrollCallback(static_cast<GLFWwindow*>(m_Window), MouseScrollCallback);
 
 		glfwMakeContextCurrent(static_cast<GLFWwindow*>(m_Window));
 		InitializeGLAD();
@@ -169,6 +115,11 @@ namespace Genesis
 		s_WindowCount--;
 
 		ShutdownGLFW();
+	}
+
+	void* Window::getInternalPointer() const
+	{
+		return m_Window;
 	}
 
 	uint32_t Window::getWidth() const
