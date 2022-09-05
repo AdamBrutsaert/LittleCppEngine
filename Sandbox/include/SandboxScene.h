@@ -16,5 +16,4 @@ private:
 	uint32_t m_Ticks;
 
 	Genesis::OrthographicCameraController m_CameraController;
-	std::shared_ptr<Genesis::Texture> m_Texture;
 };
