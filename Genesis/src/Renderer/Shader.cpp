@@ -1,11 +1,5 @@
+#include "Precompiled.h"
 #include "Renderer/Shader.h"
-
-#include <fstream>
-#include <vector>
-#include <iostream>
-
-#include <glad/glad.h>
-#include <glm/gtc/type_ptr.hpp>
 
 namespace Genesis
 {

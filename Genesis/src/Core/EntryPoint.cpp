@@ -1,3 +1,4 @@
+#include "Precompiled.h"
 #include "Core/Application.h"
 
 extern Genesis::Application* CreateApplication();

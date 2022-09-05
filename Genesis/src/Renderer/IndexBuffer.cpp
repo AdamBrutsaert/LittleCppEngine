@@ -1,3 +1,4 @@
+#include "Precompiled.h"
 #include "Renderer/IndexBuffer.h"
 
 namespace Genesis

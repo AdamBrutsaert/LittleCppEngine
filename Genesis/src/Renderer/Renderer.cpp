@@ -1,9 +1,5 @@
+#include "Precompiled.h"
 #include "Renderer/Renderer.h"
-
-#include <array>
-
-#include <glad/glad.h>
-#include <glm/gtc/matrix_transform.hpp>
 
 #include "Renderer/Shader.h"
 #include "Renderer/VertexArray.h"
@@ -157,6 +153,7 @@ void main()
 		s_VertexBuffer = nullptr;
 		s_IndexBuffer = nullptr;
 		s_VertexArray = nullptr;
+		s_Textures = { nullptr };
 
 		delete[] s_Vertices;
 		delete[] s_Indices;

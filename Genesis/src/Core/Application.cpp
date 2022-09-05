@@ -1,7 +1,5 @@
+#include "Precompiled.h"
 #include "Core/Application.h"
-
-#include <chrono>
-#include <stdexcept>
 
 #include "Renderer/Renderer.h"
 #include "MessageBus/MessageBus.h"

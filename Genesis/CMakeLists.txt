@@ -2,6 +2,7 @@ file(GLOB FILES CONFIGURE_DEPENDS "include/**/*.h" "src/**/*.cpp")
 add_library(Genesis ${FILES})
 
 target_include_directories(Genesis PUBLIC "include")
+target_precompile_headers(Genesis PRIVATE include/Precompiled.h src/Precompiled.cpp)
 
 # Macros
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")

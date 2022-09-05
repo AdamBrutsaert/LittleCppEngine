@@ -1,3 +1,4 @@
+#include "Precompiled.h"
 #include "MessageBus/MessageQueue.h"
 
 namespace Genesis {

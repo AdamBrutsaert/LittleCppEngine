@@ -1,7 +1,5 @@
+#include "Precompiled.h"
 #include "Utils/OrthographicCameraController.h"
-
-#include <cmath>
-#include <algorithm>
 
 #include "Core/Application.h"
 #include "Core/Input.h"

@@ -1,3 +1,4 @@
+#include "Precompiled.h"
 #include "Renderer/VertexArray.h"
 
 namespace Genesis

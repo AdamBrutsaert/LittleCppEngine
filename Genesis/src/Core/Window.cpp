@@ -1,9 +1,5 @@
+#include "Precompiled.h"
 #include "Core/Window.h"
-
-#include <stdexcept>
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 #include "MessageBus/MessageBus.h"
 #include "Core/Input.h"

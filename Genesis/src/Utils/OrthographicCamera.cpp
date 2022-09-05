@@ -1,6 +1,6 @@
+#include "Precompiled.h"
 #include "Utils/OrthographicCamera.h"
 
-#include <glm/gtc/matrix_transform.hpp>
 
 namespace Genesis
 {

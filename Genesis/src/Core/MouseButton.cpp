@@ -1,6 +1,5 @@
+#include "Precompiled.h"
 #include "Core/MouseButton.h"
-
-#include <GLFW/glfw3.h>
 
 namespace Genesis
 {

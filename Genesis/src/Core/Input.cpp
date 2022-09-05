@@ -1,6 +1,5 @@
+#include "Precompiled.h"
 #include "Core/Input.h"
-
-#include <GLFW/glfw3.h>
 
 #include "Core/Application.h"
 

@@ -1,7 +1,5 @@
+#include "Precompiled.h"
 #include "Renderer/Texture.h"
-
-#include <stb_image.h>
-#include <glad/glad.h>
 
 namespace Genesis
 {
