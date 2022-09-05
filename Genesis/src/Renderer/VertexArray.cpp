@@ -1,6 +1,8 @@
 #include "Precompiled.h"
 #include "Renderer/VertexArray.h"
 
+#include "Core/Logger.h"
+
 namespace Genesis
 {
 	VertexArray::VertexArray(std::shared_ptr<VertexBuffer> const& vertexBuffer,
@@ -20,11 +22,15 @@ namespace Genesis
 
 		VertexBuffer::Unbind();
 		IndexBuffer::Unbind();
+
+		LOG_INFO("Created VertexArray.");
 	}
 
 	VertexArray::~VertexArray()
 	{
 		glDeleteVertexArrays(1, &m_VertexArrayID);
+
+		LOG_INFO("Destroyed VertexArray.");
 	}
 
 	std::shared_ptr<VertexArray> VertexArray::Create(std::shared_ptr<VertexBuffer> const& vertexBuffer, std::shared_ptr<IndexBuffer> const& indexBuffer)

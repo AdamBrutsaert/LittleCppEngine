@@ -1,6 +1,7 @@
 #include "Precompiled.h"
 #include "Renderer/Renderer.h"
 
+#include "Core/Logger.h"
 #include "Renderer/Shader.h"
 #include "Renderer/VertexArray.h"
 #include "MessageBus/MessageBus.h"
@@ -145,6 +146,8 @@ void main()
 		s_VertexBuffer = VertexBuffer::Create(MAX_VERTICES, GL_DYNAMIC_DRAW);
 		s_IndexBuffer = IndexBuffer::Create(MAX_INDICES, GL_DYNAMIC_DRAW);
 		s_VertexArray = VertexArray::Create(s_VertexBuffer, s_IndexBuffer);
+
+		LOG_INFO("Initialized Renderer.");
 	}
 
 	void Renderer::Shutdown()
@@ -157,6 +160,8 @@ void main()
 
 		delete[] s_Vertices;
 		delete[] s_Indices;
+		
+		LOG_INFO("Shutdowned Renderer.");
 	}
 
 	void Renderer::Begin()

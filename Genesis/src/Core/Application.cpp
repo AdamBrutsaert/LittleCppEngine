@@ -1,6 +1,7 @@
 #include "Precompiled.h"
 #include "Core/Application.h"
 
+#include "Core/Logger.h"
 #include "Renderer/Renderer.h"
 #include "MessageBus/MessageBus.h"
 
@@ -35,6 +36,8 @@ namespace Genesis
 
 	void Application::run()
 	{
+		Logger::Initialize();
+		
 		m_Window = std::make_shared<Window>(m_Width, m_Height, m_Title);
 
 		Renderer::Initialize();

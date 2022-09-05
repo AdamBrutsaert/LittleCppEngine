@@ -1,8 +1,9 @@
 #include "Precompiled.h"
 #include "Core/Window.h"
 
-#include "MessageBus/MessageBus.h"
+#include "Core/Logger.h"
 #include "Core/Input.h"
+#include "MessageBus/MessageBus.h"
 
 namespace Genesis 
 {
@@ -17,6 +18,7 @@ namespace Genesis
 				throw std::runtime_error("Failed to initialize GLFW!");
 			}
 			s_IsGLFWInitialized = true;
+			LOG_INFO("Initialized GLFW.");
 		}
 	}
 
@@ -25,6 +27,7 @@ namespace Genesis
 		if (s_WindowCount == 0 && s_IsGLFWInitialized) {
 			glfwTerminate();
 			s_IsGLFWInitialized = false;
+			LOG_INFO("Shutdowned GLFW.");
 		}
 	}
 
@@ -35,6 +38,7 @@ namespace Genesis
 				throw std::runtime_error("Failed to initialize GLAD!");
 			}
 			s_IsGLADInitialized = true;
+			LOG_INFO("Initialized GLAD.");
 		}
 	}
 
@@ -103,12 +107,14 @@ namespace Genesis
 		InitializeGLAD();
 
 		s_WindowCount++;
+		LOG_INFO("Created Window.");
 	}
 
 	Window::~Window()
 	{
 		glfwDestroyWindow(static_cast<GLFWwindow*>(m_Window));
 		s_WindowCount--;
+		LOG_INFO("Destroyed Window.");
 
 		ShutdownGLFW();
 	}

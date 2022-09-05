@@ -1,6 +1,8 @@
 #include "Precompiled.h"
 #include "Renderer/VertexBuffer.h"
 
+#include "Core/Logger.h"
+
 namespace Genesis
 {
 	VertexBuffer::VertexBuffer(uint32_t vertexCount, GLenum type)
@@ -9,11 +11,14 @@ namespace Genesis
 		bind();
 		glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Vertex), nullptr, type);
 		Unbind();
+
+		LOG_INFO("Created VertexBuffer.");
 	}
 
 	VertexBuffer::~VertexBuffer()
 	{
 		glDeleteBuffers(1, &m_BufferID);
+		LOG_INFO("Destroyed VertexBuffer.");
 	}
 
 	std::shared_ptr<VertexBuffer> VertexBuffer::Create(uint32_t vertexCount, GLenum type)

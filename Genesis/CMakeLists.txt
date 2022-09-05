@@ -34,3 +34,13 @@ add_dependencies(Genesis stb)
 
 target_link_libraries(Genesis PRIVATE stb)
 target_include_directories(Genesis PRIVATE thirdparties/stb/include)
+
+# spdlog
+add_subdirectory(thirdparties/spdlog)
+add_dependencies(Genesis spdlog)
+
+target_link_libraries(Genesis PRIVATE spdlog::spdlog)
+target_include_directories(Genesis PRIVATE thirdparties/spdlog/include)
+
+target_compile_definitions(Genesis PRIVATE SPDLOG_COMPILED_LIB)
+target_compile_definitions(Genesis PRIVATE SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE)

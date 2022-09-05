@@ -1,6 +1,8 @@
 #include "Precompiled.h"
 #include "Renderer/Shader.h"
 
+#include "Core/Logger.h"
+
 namespace Genesis
 {
 	static uint32_t CompileShader(std::string const& source, GLenum type)
@@ -20,7 +22,7 @@ namespace Genesis
 			std::vector<char> msg(size);
 			glGetShaderInfoLog(shader, size, nullptr, msg.data());
 
-			std::cerr << msg.data() << std::endl;
+			LOG_CRITICAL(msg.data());
 			throw std::runtime_error("Failed to compile Shader!");
 		}
 
@@ -49,17 +51,20 @@ namespace Genesis
 			std::vector<char> msg(size);
 			glGetProgramInfoLog(m_ProgramID, size, nullptr, msg.data());
 
-			std::cerr << msg.data() << std::endl;
+			LOG_CRITICAL(msg.data());
 			throw std::runtime_error("Failed to link Shader!");
 		}
 
 		glDeleteShader(vertex);
 		glDeleteShader(fragment);
+
+		LOG_INFO("Created Shader.");
 	}
 
 	Shader::~Shader()
 	{
 		glDeleteProgram(m_ProgramID);
+		LOG_INFO("Destroyed Shader.");
 	}
 
 	std::shared_ptr<Shader> Shader::CreateFromSources(std::string const& vertexSource, std::string const& fragmentSource)
