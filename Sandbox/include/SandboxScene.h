@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Genesis.h>
+#include <entt/entt.hpp>
 
 class SandboxScene : public Genesis::Scene
 {
@@ -15,6 +16,8 @@ private:
 private:
 	float m_Elapsed;
 	uint32_t m_Ticks;
+
+	entt::registry m_World;
 
 	Genesis::OrthographicCameraController m_CameraController;
 

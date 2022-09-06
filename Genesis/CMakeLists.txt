@@ -44,3 +44,6 @@ target_include_directories(Genesis PRIVATE thirdparties/spdlog/include)
 
 target_compile_definitions(Genesis PRIVATE SPDLOG_COMPILED_LIB)
 target_compile_definitions(Genesis PRIVATE SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE)
+
+# entt
+target_include_directories(Genesis PUBLIC thirdparties/entt/single_include)
